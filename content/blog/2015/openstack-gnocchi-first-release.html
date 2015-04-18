@@ -17,11 +17,11 @@ tags:
 
 A few months ago, I wrote a long post about what I called back then the
 "[Gnocchi experiment](/blog/2014/openstack-ceilometer-the-gnocchi-experiment)".
-Months passed and we, me and the rest of the Gnocchi team, continued to work on
-that project and finalizing it.
+Months have passed and we, me and the rest of the Gnocchi team, have continued
+to work on the project.
 
 It's with a great pleasure that we are going to release our first *1.0* version
-this month, roughly at the same time that the integrated
+this month, roughly at the same time as the integrated
 [OpenStack](http://openstack.org) projects release their Kilo milestone.
 
 {% endmark %}
@@ -32,30 +32,30 @@ this month, roughly at the same time that the integrated
 Before I dive into Gnocchi details, it's important to have a good view of what
 problems Gnocchi is trying to solve.
 
-Most of the IT infrastructures out there consists of a set of resources. These
-resources have properties: some of them are simple attributes whereas others
+Most of the IT infrastructure out there consists of a set of resources. These
+resources have properties; some of them are simple attributes whereas others
 might be measurable quantities (also knows as metrics).
 
-And in this context, the cloud infrastructures make no exception. We talk about
-instances, volumes, networks… which are all different kind of resources. The
-problems that are arising with the cloud trend and is the scalability of
-storing all this data and be able to request them later, for whatever usage.
+In this context, cloud infrastructure makes no exception. We talk about
+instances, volumes, networks… which are all different kind of resources having
+many properties and producing many measures. Storing all this data in a scalable
+way and being able to request it later in a timely fashion is one of the rising
+problems in the cloud environment.
 
 What Gnocchi provides is a REST API that allows the user to manipulate
-resources (CRUD) and their attributes, while preserving the history of those
-resources and their attributes.
+resources (CRUD) and their attributes, while preserving the history of both.
 
 Gnocchi is fully documented and the
 [documentation is available online](http://docs.openstack.org/developer/gnocchi).
 We are the first OpenStack project to require patches to *integrate the
-documentation*. We want to raise the bar, so we took a stand on that. That's
+documentation*. We want to raise the bar, so we took a stand on that: it's
 part of our policy, the same way it's part of the OpenStack policy to require
 unit tests.
 
 I'm not going to paraphrase the whole Gnocchi documentation, which covers
 things like installation (super easy), but I'll guide you through some basics
-of the features provided by the REST API, I will show you some example so you
-can have a better understanding of what you could leveraging Gnocchi!
+of the features provided by the REST API, I will show you some examples so you
+can have a better understanding of what you could accomplish using Gnocchi!
 
 # Handling metrics
 
@@ -126,7 +126,7 @@ It's also worth noting Gnocchi is precise up to the nanosecond and is not tied
 to the current time. You can manipulate and injects measures that are years old
 and precise to the nanosecond.
 
-It's then possible to send measure to this metric:
+It's then possible to send measures to this metric:
 
 {% syntax %}
 POST /v1/metric/387101dc-e4b1-4602-8f40-e7be9f0ed46a/measures HTTP/1.1
@@ -157,10 +157,10 @@ HTTP/1.1 204 No Content
   <img src="/media/images/ceph-logo.png">
 </figure>
 
-These measure are synchronously aggregated and store into the storage backend
-configured. Our most scalable storage drivers for now are either based on
+These measure are synchronously aggregated and stored in the configured
+storage backend. Our most scalable storage drivers for now are either based on
 [Swift](http://launchpad.net/swift) or [Ceph](http://ceph.com) which are both
-scalable storage objects systems.
+scalable systems for object storage.
 
 It's then possible to retrieve these values:
 
@@ -195,10 +195,10 @@ Content-Type: application/json; charset=UTF-8
 {% endsyntax %}
 
 By default all the aggregated measures using mean are returned. You can
-obviously specify a time range or a different aggregation function using the
+specify a time range or a different aggregation function using the
 `aggregation`, `start` and `stop` query parameter.
 
-Gnocchi also support doing aggregation across aggregated metrics:
+Gnocchi also supports doing aggregation across aggregated metrics:
 
 {% syntax %}
 GET /v1/aggregation/metric?metric=65071775-52a8-4d2e-abb3-1377c2fe5c55&metric=9ccdd0d6-f56a-4bba-93dc-154980b6e69a&start=2014-10-06T14:34&aggregation=mean HTTP/1.1
@@ -220,7 +220,7 @@ Content-Type: application/json; charset=UTF-8
 ]
 {% endsyntax %}
 
-This computes the mean of mean for the metric
+This computes the mean of means for the metric
 `65071775-52a8-4d2e-abb3-1377c2fe5c55` and
 `9ccdd0d6-f56a-4bba-93dc-154980b6e69a` starting on 6th October 2014 at 14:34
 UTC.
@@ -231,11 +231,11 @@ UTC.
     class="illustration pull-right"
     style="max-width: 7%;">
 
-Another object and concept that Gnocchi provides is the ability to manipulates
-resources. There is a basic type of resource, called _generic_, which have very
-few attributes. You can extend this type to specialize it, and that's what
-Gnocchi does by default by providing resource types known for OpenStack such as
-_instance_, _volume_, _network_ or even _image_.
+Another service that Gnocchi provides is the ability to manipulate
+resources. There is a basic type of resource, called _generic_, which has very
+few attributes. It's possible to extend this type to specialize it.
+By default Gnocchi provides resource types for OpenStack such as
+_instance_, _volume_, _network_ and _image_.
 
 {% syntax %}
 POST /v1/resource/generic HTTP/1.1
@@ -270,8 +270,8 @@ Content-Type: application/json; charset=UTF-8
 {% endsyntax %}
 
 The resource is created with the UUID provided by the user. Gnocchi handles the
-history of the resource, and that's what the `revision_start` and
-`revision_end` fields are for. They indicates the lifetime of this revision of
+history of the resource, that's what the `revision_start` and
+`revision_end` fields are for. They indicate the lifetime of this revision of
 the resource. The `ETag` and `Last-Modified` headers are also unique to this
 resource revision and can be used in a subsequent request using `If-Match` or
 `If-Not-Match` header, for example:
@@ -283,12 +283,12 @@ If-Not-Match: "e3acd0681d73d85bfb8d180a7ecac75fce45a0dd"
 HTTP/1.1 304 Not Modified
 {% endsyntax %}
 
-Which is useful to synchronize and update any view of the resources you might
+This is useful to synchronize and update any view of the resources you might
 have in your application.
 
 You can use the `PATCH` HTTP method to modify properties of the resource, which
-will create a new revision of the resource. The history of the resources are
-available via the REST API obviously.
+will create a new revision of the resource. The histories of the resources are
+available via the REST API.
 
 The `metrics` properties of the resource allow you to link metrics to a
 resource. You can link existing metrics or create new one dynamically:
@@ -411,8 +411,8 @@ Content-Length: 113
 
 I could also mention the fact that you can
 [search for value in metrics](http://docs.openstack.org/developer/gnocchi/rest.html#searching-for-values-in-metrics).
-One feature that I will very likely in Gnocchi 1.1 is the ability to search for
-resource whose specific metrics matches some value. For example, having the
+One feature that will very likely be in Gnocchi 1.1 is the ability to search for
+resources whose specific metrics matches some value. For example, having the
 ability to search for instances whose CPU consumption was over 80% during a
 month.
 
@@ -429,10 +429,10 @@ interface served on top of the API for the same price!
 # Gnocchi 1.1!
 
 Gnocchi is a different beast in the OpenStack community. It is under the
-umbrella of the Ceilometer program, but it's one of the first project that is
+umbrella of the Ceilometer program, but it's one of the first projects that is
 not part of the (old) integrated release. Therefore we decided to have a
-release schedule not directly linked to the OpenStack and we'll do release more
-often that the rest of the old OpenStack components – probably once every 2
+release schedule not directly linked to the OpenStack schedule and we'll do releases more
+often that the rest of the OpenStack components – probably once every 2
 months or the like.
 
 What's coming next is a close integration with Ceilometer (e.g. moving the
